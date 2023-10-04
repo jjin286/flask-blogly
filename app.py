@@ -2,7 +2,7 @@
 
 import os
 
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User
 
@@ -28,8 +28,8 @@ def redirect_to_users():
 @app.get("/users")
 def list_users():
     """List all users"""
-# TODO: Add ordering to list, by firstname and lastname
-    users = User.query.all()
+
+    users = User.query.order_by('last_name', 'first_name').all()
     return render_template('users.html', users=users)
 
 @app.get("/users/new")
@@ -38,21 +38,19 @@ def display_new_user_form():
 
     return render_template('create_user.html')
 
-# TODO: Change view function name and docstring to reflect actual actions taken
 @app.post("/users/new")
-def submit_new_user_form():
-    """Submit new user data from form"""
+def handle_new_user_form_submit():
+    """Add new user's details to database"""
 
     first_name = request.form['first_name']
     last_name = request.form['last_name']
-    # TODO: Think about how to handle empty url to trigger defaul image
-    breakpoint()
-    image_url = request.form['image_url']
+
+    image_url = (request.form['image_url'] or None)
 
     user = User(first_name=first_name, last_name=last_name, image_url=image_url)
     db.session.add(user)
     db.session.commit()
-    # TODO: Flash message confirming user creation
+    flash(f"User successfully added: {first_name} {last_name}")
 
     return redirect('/users')
 
@@ -82,8 +80,10 @@ def update_user_details(user_id):
     user.first_name = first_name
     user.last_name = last_name
     user.image_url = image_url
-# TODO: confirmation flash message
+
     db.session.commit()
+
+    flash(f"User updated successfully: {first_name} {last_name}")
 
     return redirect('/users')
 
@@ -94,6 +94,7 @@ def delete_user(user_id):
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit()
-    # TODO: Confirmation of deletion of user, flash message
+
+    flash(f"User deleted successfully: {user.first_name} {user.last_name}")
 
     return redirect('/users')

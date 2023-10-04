@@ -5,17 +5,21 @@ User Detail
 {% endblock %}
 
 {% block content %}
-<!-- User Detail Template - used in testing -->
-<!-- TODO:  formaction and formmethod in button, insert alt, conditional logic for photo-->
-<div>
-  <h1>{{ user.first_name }} {{ user.last_name }}</h1>
-  <img src="{{ user.image_url }}" alt="">
-  <form action="/users/{{ user.id }}/edit">
-    <button>Edit</button>
-  </form>
-  <form action="/users/{{ user.id }}/delete" method="POST">
-    <button>Delete</button>
-  </form>
-</div>
+  <!-- User Detail Template - used in testing -->
+  <!-- TODO:  conditional logic for photo-->
+
+  {% for message in get_flashed_messages() %}
+    <p>{{ message }}</p>
+  {% endfor %}
+
+  <div>
+    <h1>{{ user.first_name }} {{ user.last_name }}</h1>
+    <img src="{{ user.image_url }}"
+         alt="Profile photo for {{ user.first_name }} {{ user.last_name }}">
+    <button formmaction="/users/{{ user.id }}/edit">Edit</button>
+    <button formaction="/users/{{ user.id }}/delete" formmethod="POST">
+      Delete
+    </button>
+  </div>
 
 {% endblock %}
