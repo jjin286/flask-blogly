@@ -5,8 +5,10 @@ Edit a user
 {% endblock %}
 
 {% block content %}
+<!-- Edit User Form Template - used in testing -->
 <h1>Edit {{ user.first_name }} {{ user.last_name }}</h1>
-
+<!-- Link button instead of form -->
+<!-- TODO: Input format, remove action, type=text, button type submit-->
 <form action="/users/{{ user.id }}/edit" method="POST">
   <label for="first_name">First Name</label>
   <input type="text" name="first_name" id="first_name" value="{{ user.first_name }}">

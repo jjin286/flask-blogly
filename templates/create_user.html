@@ -5,11 +5,16 @@ Create a user
 {% endblock %}
 
 {% block content %}
+<!-- Create User Form Template - used for testing -->
 <h1>Create a user</h1>
-
+<!-- TODO: Input format, remove action, type=text, button type submit-->
 <form action="" method="POST">
   <label for="first_name">First Name</label>
-  <input type="text" name="first_name" id="first_name" placeholder="Enter a first name">
+  <input
+    type="text"
+    name="first_name"
+    id="first_name"
+    placeholder="Enter a first name">
   <label for="last_name">Last Name</label>
   <input type="text" name="last_name" id="last_name" placeholder="Enter a last name">
   <label for="image_url">Image Url</label>
