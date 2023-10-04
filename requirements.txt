@@ -1,0 +1,7 @@
+Flask<3
+Werkzeug<3
+git+https://github.com/pallets-eco/flask-debugtoolbar
+Flask-SQLAlchemy
+psycopg2-binary
+ipython
+packaging
