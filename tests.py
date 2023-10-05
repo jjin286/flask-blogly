@@ -34,13 +34,15 @@ class UserViewTestCase(TestCase):
         User.query.delete()
 
         self.test_user = User(
+            id=99, # Will only work as long as there are < 99 users in test db at a time.-
             first_name="test1_first",
             last_name="test1_last",
             image_url=None,
         )
 
+        self.test_post_title = 'test1_title' # Need this for testing delete.
         self.test_post = Post(
-            title='test1_title',
+            title=self.test_post_title,
             content='test1_content',
             user_id=self.test_user.id
         )
@@ -170,6 +172,36 @@ class UserViewTestCase(TestCase):
             self.assertIn("<!-- Edit Post Form Template - used for testing -->", html)
             self.assertIn(self.test_post.title, html)
             self.assertIn(self.test_post.content, html)
+
+    def test_handle_edit_post_submission(self):
+        """Test handling an edit post submission."""
+
+        with app.test_client() as c:
+            resp = c.post(f"/posts/{self.test_post.id}/edit",
+                          data={'title': 'test_title_edited',
+                                'content': 'test_content_edited'
+                                },
+                           follow_redirects=True
+                                )
+            self.assertEqual(resp.status_code, 200)
+            html = resp.get_data(as_text=True)
+            self.assertIn('test_title_edited', html)
+            self.assertIn('test_content_edited', html)
+
+    def test_handle_delete_post(self):
+        """Test handling deleting a post."""
+
+        with app.test_client() as c:
+            resp = c.post(f"/posts/{self.test_post.id}/delete",
+                           follow_redirects=True
+                                )
+            self.assertEqual(resp.status_code, 200)
+            html = resp.get_data(as_text=True)
+
+            # Deleted title should only show up once (in flashed message).
+            self.assertTrue(html.count(self.test_post.title) == 1)
+
+
 
 
 

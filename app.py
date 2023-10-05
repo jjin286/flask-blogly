@@ -152,7 +152,7 @@ def handle_edit_post_submission(post_id):
     post.title = request.form["title"]
     post.content = request.form["content"]
 
-    db.commit()
+    db.session.commit()
 
     flash(f"\"{post.title}\" successfully updated.")
 
@@ -163,9 +163,11 @@ def handle_delete_post(post_id):
     """Handles deleting a post."""
 
     post = Post.query.get_or_404(post_id)
+    
+    user_id = post.user.id # For redirect
     db.session.delete(post)
     db.session.commit()
 
     flash(f"Post \"{post.title}\" deleted successfully.")
 
-    return redirect(f'/users/{post.user.id}')
+    return redirect(f'/users/{user_id}')
