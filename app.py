@@ -66,7 +66,8 @@ def show_edit_user_form(user_id):
     """Show form for editing details about a particular user"""
 
     user = User.query.get_or_404(user_id)
-    return render_template('edit_user.html', user=user)
+    posts = User.posts
+    return render_template('edit_user.html', user=user, posts=posts)
 
 @app.post("/users/<int:user_id>/edit")
 def update_user_details(user_id):
@@ -98,3 +99,11 @@ def delete_user(user_id):
     flash(f"User deleted successfully: {user.first_name} {user.last_name}")
 
     return redirect('/users')
+
+@app.get("/users/<int:user_id>/posts/new")
+
+@app.post("/users/<int:user_id>/posts/new")
+@app.get("/posts/<int:post_id>")
+@app.get("/posts/<int:post_id>/edit")
+@app.post("/posts/<int:post_id>/edit")
+@app.post("/posts/<int:post_id>/delete")

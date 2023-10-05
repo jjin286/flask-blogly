@@ -21,5 +21,14 @@ User Detail
       Delete
     </button>
   </div>
+  <div>
+    <h3>Posts</h3>
+    <ul>
+      {% for post in posts %}
+        <li><a href="">{{ post.title }}</a></li>
+      {% endfor %}
+    </ul>
+    <button formaction="/">Add Post</button>
+  </div>
 
 {% endblock %}
