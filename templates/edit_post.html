@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Create a new post
+{% endblock %}
+
+{% block content %}
+<!-- Create Post Form Template - used for testing -->
+<h1>Create a post</h1>
+
+<form action="" method="POST">
+  <label for="title">Title</label>
+  <input name="title" id="title" value="{{ post.title }}">
+  <label for="content">Content</label>
+  <textarea
+    name="content"
+    id="content"
+    value="{{ post.content }}">
+  <button formaction="" formmethod="POST">Submit</button>
+  <button formaction="/post/{{ post.id }}">Cancel</button>
+</form>
+{% endblock %}

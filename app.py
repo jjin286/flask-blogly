@@ -4,7 +4,7 @@ import os
 
 from flask import Flask, request, redirect, render_template, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User
+from models import db, connect_db, User, Post
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
@@ -96,14 +96,75 @@ def delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
 
-    flash(f"User deleted successfully: {user.first_name} {user.last_name}")
+    flash(f"User {user.first_name} {user.last_name} \
+        deleted successfully.")
 
     return redirect('/users')
 
 @app.get("/users/<int:user_id>/posts/new")
+def show_new_post_form(user_id):
+    """Show new post form."""
+
+    return render_template("create_post.html", user_id=user_id)
 
 @app.post("/users/<int:user_id>/posts/new")
+def handle_new_post_submit(user_id):
+    """
+    Updates the database with the new post,
+    redirects to /posts.
+    """
+
+    title = request.form["title"]
+    content = request.form["content"]
+
+    post = Post(title=title, content=content, user_id=user_id)
+
+    db.session.add(post)
+    db.session.commit()
+
+    flash(f"\"{title}\" successfully posted.")
+
+    return redirect(f"/users/{user_id}")
+
 @app.get("/posts/<int:post_id>")
+def show_post_content(post_id):
+    """Shows the content of a particular post."""
+
+    post = Post.query.get_or_404(post_id)
+    return render_template("post.html", post=post)
+
 @app.get("/posts/<int:post_id>/edit")
+def show_edit_post_form(post_id):
+    """Shows the form where a user can edit a post."""
+
+    post = Post.query.get(post_id)
+    return render_template("edit_post.html", post=post)
+
 @app.post("/posts/<int:post_id>/edit")
+def handle_edit_post_submission(post_id):
+    """
+    Handles updating the database and redirecting after
+    a user submits an edit to a post.
+    """
+
+    post = Post.query.get_or_404(post_id)
+    post.title = request.form["title"]
+    post.content = request.form["content"]
+
+    db.commit()
+
+    flash(f"\"{post.title}\" successfully updated.")
+
+    return redirect(f"/posts/{post.id}")
+
 @app.post("/posts/<int:post_id>/delete")
+def handle_delete_post(post_id):
+    """Handles deleting a post."""
+
+    post = Post.query.get_or_404(post_id)
+    db.session.delete(post)
+    db.session.commit()
+
+    flash(f"Post \"{post.title}\" deleted successfully.")
+
+    return redirect(f'/users/{post.user.id}')
