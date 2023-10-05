@@ -109,6 +109,40 @@ class UserViewTestCase(TestCase):
             self.assertIn((f"<h1>Edit { self.test_user.first_name }"
                            f" { self.test_user.last_name }</h1>"), html)
 
+    def test_update_user_details(self):
+        """Test updating an existing user's details."""
+
+        with app.test_client() as c:
+            resp = c.post(f"/users/{self.test_user.id}/edit",
+                          data={'first_name': 'test1_first_edited',
+                                'last_name': 'test1_last_edited',
+                                'image_url': 'edited'
+                                },
+                           follow_redirects=True
+                                )
+            self.assertEqual(resp.status_code, 200)
+
+            html = resp.get_data(as_text=True)
+            self.assertIn('test1_first_edited test1_last_edited', html)
+
+    def test_delete_user(self):
+        """Test deleting a user."""
+
+        with app.test_client() as c:
+            resp = c.post(f"/users/{self.test_user.id}/delete",
+                           follow_redirects=True
+                                )
+            self.assertEqual(resp.status_code, 200)
+
+            html = resp.get_data(as_text=True)
+            # Deleted user's name should only show up once (in flashed message).
+            #print(f"{self.test_user.first_name} {self.test_user.last_name}")
+            self.assertTrue(
+                html.count(
+                    f"{self.test_user.first_name} {self.test_user.last_name}"
+                    ) == 1
+                )
+
 
 
 
@@ -123,24 +157,28 @@ class PostViewTestCase(TestCase):
         User.query.delete()
 
         self.test_user = User(
-            id=99, # Will only work as long as there are < 99 users in test db at a time.-
             first_name="test1_first",
             last_name="test1_last",
             image_url=None,
         )
 
-        # db.session.add(self.test_user)
-        # db.session.commit()
-        # TODO: revert back to before
+        db.session.add(self.test_user)
+        db.session.commit()
 
-        self.test_post_title = 'test1_title' # Need this for testing delete.
+        test_user_id = (User.query
+            .filter(
+                (User.first_name == self.test_user.first_name) and
+                (User.last_name == self.test_user.last_name))
+            .one()
+            .id
+                )
+
         self.test_post = Post(
-            title=self.test_post_title,
+            title='test1_title',
             content='test1_content',
-            user_id=self.test_user.id
+            user_id=test_user_id
         )
 
-        db.session.add(self.test_user)
         db.session.add(self.test_post)
         db.session.commit()
 

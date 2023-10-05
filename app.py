@@ -98,7 +98,8 @@ def delete_user(user_id):
     """Delete the user and user's posts from the database"""
 
     user = User.query.get_or_404(user_id)
-    db.session.delete(user.posts)
+
+    Post.query.filter(Post.user_id == user.id).delete()
     db.session.delete(user)
     db.session.commit()
 
@@ -110,7 +111,8 @@ def delete_user(user_id):
 @app.get("/users/<int:user_id>/posts/new")
 def show_new_post_form(user_id):
     """Show new post form."""
-# TODO: get 404 to validate user
+
+    User.query.get_or_404(user_id) # Just to validate.
     return render_template("create_post.html", user_id=user_id)
 
 @app.post("/users/<int:user_id>/posts/new")
@@ -119,7 +121,9 @@ def handle_new_post_submit(user_id):
     Updates the database with the new post,
     redirects to /posts.
     """
-#TODO: get 404 to validate
+
+    User.query.get_or_404(user_id) # Just to validate.
+
     title = request.form["title"]
     content = request.form["content"]
 
@@ -142,8 +146,8 @@ def show_post_content(post_id):
 @app.get("/posts/<int:post_id>/edit")
 def show_edit_post_form(post_id):
     """Shows the form where a user can edit a post."""
-#TODO: get 404
-    post = Post.query.get(post_id)
+
+    post = Post.query.get_or_404(post_id)
     return render_template("edit_post.html", post=post)
 
 @app.post("/posts/<int:post_id>/edit")
