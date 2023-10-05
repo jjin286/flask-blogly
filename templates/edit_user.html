@@ -7,9 +7,6 @@ Edit a user
 {% block content %}
 <!-- Edit User Form Template - used in testing -->
 <h1>Edit {{ user.first_name }} {{ user.last_name }}</h1>
-<!-- Link button instead of form -->
-
-
 
 <form action="" method="POST">
   <label for="first_name">First Name</label>
@@ -19,8 +16,9 @@ Edit a user
   <label for="image_url">Image Url</label>
   <input name="image_url" id="image_url" value="{{ user.image_url }}">
   <button type="submit">Save</button>
+  <button formaction="/users/{{ user.id }}" formmethod="GET">Cancel</button>
 </form>
 
-<button formaction="/users/{{ user.id }}">Cancel</button>
+
 
 {% endblock %}

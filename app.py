@@ -59,7 +59,12 @@ def show_user_details(user_id):
     """Show details about a particular user"""
 
     user = User.query.get_or_404(user_id)
-    return render_template("user_detail.html", user=user)
+    posts = (Post
+        .query
+        .filter(Post.user_id == user.id)
+        .order_by(Post.created_at.desc())
+        .all())
+    return render_template("user_detail.html", user=user, posts=posts)
 
 @app.get("/users/<int:user_id>/edit")
 def show_edit_user_form(user_id):
@@ -105,7 +110,7 @@ def delete_user(user_id):
 @app.get("/users/<int:user_id>/posts/new")
 def show_new_post_form(user_id):
     """Show new post form."""
-
+# TODO: get 404 to validate user
     return render_template("create_post.html", user_id=user_id)
 
 @app.post("/users/<int:user_id>/posts/new")
@@ -114,7 +119,7 @@ def handle_new_post_submit(user_id):
     Updates the database with the new post,
     redirects to /posts.
     """
-
+#TODO: get 404 to validate
     title = request.form["title"]
     content = request.form["content"]
 
@@ -137,7 +142,7 @@ def show_post_content(post_id):
 @app.get("/posts/<int:post_id>/edit")
 def show_edit_post_form(post_id):
     """Shows the form where a user can edit a post."""
-
+#TODO: get 404
     post = Post.query.get(post_id)
     return render_template("edit_post.html", post=post)
 
@@ -163,11 +168,11 @@ def handle_delete_post(post_id):
     """Handles deleting a post."""
 
     post = Post.query.get_or_404(post_id)
-    
-    user_id = post.user.id # For redirect
+
     db.session.delete(post)
     db.session.commit()
 
     flash(f"Post \"{post.title}\" deleted successfully.")
 
-    return redirect(f'/users/{user_id}')
+    return redirect(f'/users/{post.user_id}')
+

@@ -12,10 +12,9 @@ Edit {{ post.title }}
   <label for="title">Title</label>
   <input name="title" id="title" value="{{ post.title }}">
   <label for="content">Content</label>
-  <textarea
-    name="content"
-    id="content"
-    value="{{ post.content }}">
+  <textarea name="content" id="content">
+    {{ post.content }}
+  </textarea>
   <button formaction="" formmethod="POST">Submit</button>
   <button formaction="/post/{{ post.id }}">Cancel</button>
 </form>

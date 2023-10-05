@@ -30,36 +30,22 @@ class UserViewTestCase(TestCase):
         # As you add more models later in the exercise, you'll want to delete
         # all of their records before each test just as we're doing with the
         # User model below.
-        Post.query.delete()
+        Post.query.delete() #Why is this necessary
         User.query.delete()
 
         self.test_user = User(
-            id=99, # Will only work as long as there are < 99 users in test db at a time.-
             first_name="test1_first",
             last_name="test1_last",
             image_url=None,
         )
 
-        self.test_post_title = 'test1_title' # Need this for testing delete.
-        self.test_post = Post(
-            title=self.test_post_title,
-            content='test1_content',
-            user_id=self.test_user.id
-        )
-
         db.session.add(self.test_user)
-        db.session.add(self.test_post)
         db.session.commit()
 
-        # We can hold onto our test_user's id by attaching it to self (which is
-        # accessible throughout this test class). This way, we'll be able to
-        # rely on this user in our tests without needing to know the numeric
-        # value of their id, since it will change each time our tests are run.
-
-        # self.user_id = test_user.id
 
     def tearDown(self):
         """Clean up any fouled transaction."""
+
         db.session.rollback()
 
 
@@ -124,12 +110,55 @@ class UserViewTestCase(TestCase):
                            f" { self.test_user.last_name }</h1>"), html)
 
 
+
+
+
+class PostViewTestCase(TestCase):
+    """Test views for posts."""
+
+    def setUp(self):
+        """Create test user and test post, add sample data."""
+
+        Post.query.delete()
+        User.query.delete()
+
+        self.test_user = User(
+            id=99, # Will only work as long as there are < 99 users in test db at a time.-
+            first_name="test1_first",
+            last_name="test1_last",
+            image_url=None,
+        )
+
+        # db.session.add(self.test_user)
+        # db.session.commit()
+        # TODO: revert back to before
+
+        self.test_post_title = 'test1_title' # Need this for testing delete.
+        self.test_post = Post(
+            title=self.test_post_title,
+            content='test1_content',
+            user_id=self.test_user.id
+        )
+
+        db.session.add(self.test_user)
+        db.session.add(self.test_post)
+        db.session.commit()
+
+
+
+    def tearDown(self):
+        """Clean up any fouled transaction."""
+
+        db.session.rollback()
+
+
     def test_show_new_post_form(self):
         """Test new post form page"""
 
         with app.test_client() as c:
             resp = c.get(f"/users/{self.test_user.id}/posts/new")
             self.assertEqual(resp.status_code, 200)
+
             html = resp.get_data(as_text=True)
             self.assertIn("<!-- Create Post Form Template - used for testing -->", html)
 
@@ -146,16 +175,18 @@ class UserViewTestCase(TestCase):
                            follow_redirects=True
                                 )
             self.assertEqual(resp.status_code, 200)
+
             html = resp.get_data(as_text=True)
             self.assertIn('test_title', html)
 
 
     def test_show_post_content(self):
-        """Test post content page"""
+        """Test show post content page"""
 
         with app.test_client() as c:
             resp = c.get(f"/posts/{self.test_post.id}")
             self.assertEqual(resp.status_code, 200)
+
             html = resp.get_data(as_text=True)
             self.assertIn("<!-- Post Template - used for testing -->", html)
             self.assertIn(self.test_post.title, html)
@@ -168,10 +199,12 @@ class UserViewTestCase(TestCase):
         with app.test_client() as c:
             resp = c.get(f"/posts/{self.test_post.id}/edit")
             self.assertEqual(resp.status_code, 200)
+
             html = resp.get_data(as_text=True)
             self.assertIn("<!-- Edit Post Form Template - used for testing -->", html)
             self.assertIn(self.test_post.title, html)
             self.assertIn(self.test_post.content, html)
+
 
     def test_handle_edit_post_submission(self):
         """Test handling an edit post submission."""
@@ -184,9 +217,11 @@ class UserViewTestCase(TestCase):
                            follow_redirects=True
                                 )
             self.assertEqual(resp.status_code, 200)
+
             html = resp.get_data(as_text=True)
             self.assertIn('test_title_edited', html)
             self.assertIn('test_content_edited', html)
+
 
     def test_handle_delete_post(self):
         """Test handling deleting a post."""
@@ -196,13 +231,12 @@ class UserViewTestCase(TestCase):
                            follow_redirects=True
                                 )
             self.assertEqual(resp.status_code, 200)
-            html = resp.get_data(as_text=True)
 
+            html = resp.get_data(as_text=True)
             # Deleted title should only show up once (in flashed message).
             self.assertTrue(html.count(self.test_post.title) == 1)
 
 
 
-
-
+#TODO: add pessimistic situations
 

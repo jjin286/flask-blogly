@@ -14,15 +14,18 @@
     {{ post.content }}
   </article>
 
-  <button formaction="/users/{{ post.user.id }}">
-    Back
-  </button>
-  <button formaction="/posts/{{ post.id }}/edit">
-    Edit
-  </button>
-  <button
-    formaction="/posts/{{ post.id }}/delete"
-    formmethod="POST">
-    Delete
-  </button>
+  <form>
+    <button formaction="/users/{{ post.user.id }}">
+      Back
+    </button>
+    <button formaction="/posts/{{ post.id }}/edit">
+      Edit
+    </button>
+    <button
+      formaction="/posts/{{ post.id }}/delete"
+      formmethod="POST">
+      Delete
+    </button>
+  </form>
+
 {% endblock %}

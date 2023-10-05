@@ -7,7 +7,7 @@ User Detail
 {% block content %}
   <!-- User Detail Template - used in testing -->
   <!-- TODO:  conditional logic for photo-->
-
+<!-- TODO: Consider moving flashed message into base template -->
   {% for message in get_flashed_messages() %}
     <p>{{ message }}</p>
   {% endfor %}
@@ -15,20 +15,24 @@ User Detail
   <div>
     <h1>{{ user.first_name }} {{ user.last_name }}</h1>
     <img src="{{ user.image_url }}"
-         alt="Profile photo for {{ user.first_name }} {{ user.last_name }}">
-    <button formmaction="/users/{{ user.id }}/edit">Edit</button>
-    <button formaction="/users/{{ user.id }}/delete" formmethod="POST">
-      Delete
-    </button>
+         alt="Profile photo for {{ user.first_name }} {{ user.last_name }}"
+         width="500">
+    <form>
+      <button formaction="/users/{{ user.id }}/edit">Edit</button>
+      <button formaction="/users/{{ user.id }}/delete" formmethod="POST">
+        Delete
+      </button>
+    </form>
   </div>
+
   <div>
     <h3>Posts</h3>
     <ul>
       {% for post in posts %}
-        <li><a href="">{{ post.title }}</a></li>
+        <li><a href="/posts/{{ post.id }}">{{ post.title }}</a></li>
       {% endfor %}
     </ul>
-    <button formaction="/">Add Post</button>
+    <a href="/users/{{ user.id }}/posts/new">Add Post</a>
   </div>
 
 {% endblock %}
