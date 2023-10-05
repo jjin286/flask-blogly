@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Create a new tag
+{% endblock %}
+
+{% block content %}
+<!-- Create Tag Form Template - used for testing -->
+<h1>Create a tag</h1>
+
+<form action="" method="POST">
+  <label for="name">Name</label>
+  <input name="name" id="name">
+  <button formaction="" formmethod="POST">Add</button>
+  <button formaction="/tags">Cancel</button>
+</form>
+{% endblock %}
+

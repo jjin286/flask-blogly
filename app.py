@@ -4,7 +4,7 @@ import os
 
 from flask import Flask, request, redirect, render_template, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User, Post
+from models import db, connect_db, User, Post, Tag
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
@@ -180,3 +180,61 @@ def handle_delete_post(post_id):
 
     return redirect(f'/users/{post.user_id}')
 
+@app.get("/tags")
+def show_tags():
+    """Shows a list of all tags."""
+
+    tags = Tag.query.order_by('name').all()
+    return render_template("tags.html", tags=tags)
+
+
+@app.get("/tags/<int:tag_id>")
+def show_tag_details(tag_id):
+    """Shows details about a specific tag."""
+
+    tag = Tag.query.get_or_404(tag_id)
+    return render_template("tag_detail.html", tag=tag)
+
+@app.get("/tags/new")
+def show_new_tag_form():
+    """Shows new tag form."""
+
+    return render_template("create_tag.html")
+
+
+@app.post("/tags/new")
+def handle_new_tag_submit():
+    """Handles new tag submit."""
+
+    name = request.form['name']
+
+    tag = Tag(name=name)
+    db.session.add(tag)
+    db.session.commit()
+
+    flash(f"Tag \"{tag.name}\" added successfully.")
+
+    return redirect(f'/tags')
+
+
+@app.get("/tags/<int: tag_id>/edit")
+def show_edit_tag_form(tag_id):
+    """Shows edit tag form."""
+
+    tag = Tag.query.get_or_404(tag_id)
+    return render_template("create_tag.html", tag=tag)
+
+@app.post("/tags/<int: tag_id>/edit")
+def handle_edit_tag_submission(tag_id):
+    """Handles edit tag submit."""
+
+    name = request.form['name']
+
+    tag = Tag.query.get_or_404(tag_id)
+    tag.name = name
+
+    db.session.commit()
+
+    flash(f"Tag \"{tag.name}\" updated successfully.")
+
+    return redirect(f'/tags')

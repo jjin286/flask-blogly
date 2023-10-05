@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+  {% block title %}
+
+  {{ tag.name }} tag
+
+  {% endblock %}
+
+  {% block content %}
+  <!-- Tag Details Template - used for testing -->
+  <h1>{{ tag.name }}</h1>
+
+  <ul>
+    {% for post in tag.posts %}
+      <li><a href="/posts/{{ post.id }}">{{ post.title }}</a></li>
+    {% endfor %}
+  </ul>
+
+  <a href="">Edit</a>
+  <a href="">Delete</a>
+
+{% endblock %}
