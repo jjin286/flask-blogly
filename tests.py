@@ -5,7 +5,7 @@ os.environ["DATABASE_URL"] = "postgresql:///blogly_test"
 from unittest import TestCase
 
 from app import app, db
-from models import DEFAULT_IMAGE_URL, User
+from models import DEFAULT_IMAGE_URL, User, Post
 
 # Make Flask errors be real errors, rather than HTML pages with error info
 app.config['TESTING'] = True
@@ -30,6 +30,7 @@ class UserViewTestCase(TestCase):
         # As you add more models later in the exercise, you'll want to delete
         # all of their records before each test just as we're doing with the
         # User model below.
+        Post.query.delete()
         User.query.delete()
 
         self.test_user = User(
@@ -38,7 +39,14 @@ class UserViewTestCase(TestCase):
             image_url=None,
         )
 
+        self.test_post = Post(
+            title='test1_title',
+            content='test1_content',
+            user_id=self.test_user.id
+        )
+
         db.session.add(self.test_user)
+        db.session.add(self.test_post)
         db.session.commit()
 
         # We can hold onto our test_user's id by attaching it to self (which is
@@ -113,6 +121,55 @@ class UserViewTestCase(TestCase):
             self.assertIn((f"<h1>Edit { self.test_user.first_name }"
                            f" { self.test_user.last_name }</h1>"), html)
 
+
+    def test_show_new_post_form(self):
+        """Test new post form page"""
+
+        with app.test_client() as c:
+            resp = c.get(f"/users/{self.test_user.id}/posts/new")
+            self.assertEqual(resp.status_code, 200)
+            html = resp.get_data(as_text=True)
+            self.assertIn("<!-- Create Post Form Template - used for testing -->", html)
+
+
+    def test_handle_new_post_submit(self):
+        """Test handling of new post submition"""
+
+        with app.test_client() as c:
+            resp = c.post(f"/users/{self.test_user.id}/posts/new",
+                          data={'user_id': self.test_user.id,
+                                'title': 'test_title',
+                                'content': 'test_content'
+                                },
+                           follow_redirects=True
+                                )
+            self.assertEqual(resp.status_code, 200)
+            html = resp.get_data(as_text=True)
+            self.assertIn('test_title', html)
+
+
+    def test_show_post_content(self):
+        """Test post content page"""
+
+        with app.test_client() as c:
+            resp = c.get(f"/posts/{self.test_post.id}")
+            self.assertEqual(resp.status_code, 200)
+            html = resp.get_data(as_text=True)
+            self.assertIn("<!-- Post Template - used for testing -->", html)
+            self.assertIn(self.test_post.title, html)
+            self.assertIn(self.test_post.content, html)
+
+
+    def test_show_edit_post_form(self):
+        """Test show edit post page"""
+
+        with app.test_client() as c:
+            resp = c.get(f"/posts/{self.test_post.id}/edit")
+            self.assertEqual(resp.status_code, 200)
+            html = resp.get_data(as_text=True)
+            self.assertIn("<!-- Edit Post Form Template - used for testing -->", html)
+            self.assertIn(self.test_post.title, html)
+            self.assertIn(self.test_post.content, html)
 
 
 

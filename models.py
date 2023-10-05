@@ -58,6 +58,11 @@ class Post(db.Model):
     )
 
     content = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    created_at = db.Column(
         db.DateTime,
         nullable=False,
         default=datetime.utcnow

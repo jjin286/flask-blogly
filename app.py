@@ -90,9 +90,10 @@ def update_user_details(user_id):
 
 @app.post("/users/<int:user_id>/delete")
 def delete_user(user_id):
-    """Delete the user from the database"""
+    """Delete the user and user's posts from the database"""
 
     user = User.query.get_or_404(user_id)
+    db.session.delete(user.posts)
     db.session.delete(user)
     db.session.commit()
 
