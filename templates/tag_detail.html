@@ -16,7 +16,10 @@
     {% endfor %}
   </ul>
 
-  <a href="">Edit</a>
-  <a href="">Delete</a>
+  <a href="/tags/{{ tag.id }}/edit">Edit</a>
+  <form action="/tags/{{ tag.id }}/delete" method="POST">
+    <button type="submit">Delete</button>
+  </form>
+
 
 {% endblock %}

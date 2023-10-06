@@ -8,9 +8,6 @@ User Detail
   <!-- User Detail Template - used in testing -->
   <!-- TODO:  conditional logic for photo-->
 <!-- TODO: Consider moving flashed message into base template -->
-  {% for message in get_flashed_messages() %}
-    <p>{{ message }}</p>
-  {% endfor %}
 
   <div>
     <h1>{{ user.first_name }} {{ user.last_name }}</h1>

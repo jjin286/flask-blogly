@@ -12,10 +12,10 @@
 
   <ul>
     {% for tag in tags %}
-      <li><a href="">{{ tag.name }}</a></li>
+      <li><a href="/tags/{{ tag.id }}">{{ tag.name }}</a></li>
     {% endfor %}
   </ul>
 
-  <a href="">Add Tag</a>
+  <a href="/tags/new">Add Tag</a>
 
 {% endblock %}

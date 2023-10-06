@@ -113,7 +113,8 @@ def show_new_post_form(user_id):
     """Show new post form."""
 
     User.query.get_or_404(user_id) # Just to validate.
-    return render_template("create_post.html", user_id=user_id)
+    tags = Tag.query.all()
+    return render_template("create_post.html", user_id=user_id, tags=tags)
 
 @app.post("/users/<int:user_id>/posts/new")
 def handle_new_post_submit(user_id):
@@ -127,7 +128,12 @@ def handle_new_post_submit(user_id):
     title = request.form["title"]
     content = request.form["content"]
 
+    tag_ids = [int(tag_id) for tag_id in request.form.getlist('tag')]
+    tags = Tag.query.filter(Tag.id.in_(tag_ids)).all()
+
     post = Post(title=title, content=content, user_id=user_id)
+    post.tags = tags
+    #breakpoint()
 
     db.session.add(post)
     db.session.commit()
@@ -148,7 +154,13 @@ def show_edit_post_form(post_id):
     """Shows the form where a user can edit a post."""
 
     post = Post.query.get_or_404(post_id)
-    return render_template("edit_post.html", post=post)
+
+    unselected_tags = Tag.query.filter(~Tag.id.in_([tag.id for tag in post.tags]))
+
+    return render_template(
+        "edit_post.html",
+        post=post,
+        unselected_tags=unselected_tags)
 
 @app.post("/posts/<int:post_id>/edit")
 def handle_edit_post_submission(post_id):
@@ -158,8 +170,13 @@ def handle_edit_post_submission(post_id):
     """
 
     post = Post.query.get_or_404(post_id)
+
+    tag_ids = [int(tag_id) for tag_id in request.form.getlist('tag')]
+    tags = Tag.query.filter(Tag.id.in_(tag_ids)).all()
+
     post.title = request.form["title"]
     post.content = request.form["content"]
+    post.tags = tags
 
     db.session.commit()
 
@@ -217,14 +234,14 @@ def handle_new_tag_submit():
     return redirect(f'/tags')
 
 
-@app.get("/tags/<int: tag_id>/edit")
+@app.get("/tags/<int:tag_id>/edit")
 def show_edit_tag_form(tag_id):
     """Shows edit tag form."""
 
     tag = Tag.query.get_or_404(tag_id)
     return render_template("create_tag.html", tag=tag)
 
-@app.post("/tags/<int: tag_id>/edit")
+@app.post("/tags/<int:tag_id>/edit")
 def handle_edit_tag_submission(tag_id):
     """Handles edit tag submit."""
 
@@ -236,5 +253,18 @@ def handle_edit_tag_submission(tag_id):
     db.session.commit()
 
     flash(f"Tag \"{tag.name}\" updated successfully.")
+
+    return redirect(f'/tags')
+
+@app.post("/tags/<int:tag_id>/delete")
+def handle_delete_tag(tag_id):
+    """Handles deleting a tag."""
+
+    tag = Tag.query.get_or_404(tag_id)
+
+    db.session.delete(tag)
+    db.session.commit()
+
+    flash(f"Tag \"{tag.name}\" deleted successfully.")
 
     return redirect(f'/tags')

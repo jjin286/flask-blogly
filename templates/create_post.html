@@ -13,6 +13,12 @@ Create a new post
   <input name="title" id="title">
   <label for="content">Content</label>
   <textarea name="content" id="content" ></textarea>
+
+  {% for tag in tags %}
+    <input type="checkbox" id="{{ tag.id }}" name="tag" value="{{ tag.id }}">
+    <label for="{{ tag.id }}">{{ tag.name }}</label>
+  {% endfor %}
+
   <button formaction="" formmethod="POST">Add</button>
   <button formaction="/users/{{ user_id }}">Cancel</button>
 </form>
